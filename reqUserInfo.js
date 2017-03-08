@@ -50,8 +50,8 @@ function reqUserInfo(url, callback) {
         $ = cheerio.load(body.toString());
         var username = $(".ProfileHeader-name").text();
         var sex ;
-        var female=$('.Icon--female');
-        var male=$('.Icon--male');
+        var female=$('.Icon--female').html();
+        var male=$('.Icon--male').html();
         if (female != null&&male==null) {
             sex = 'female';
         }else if(female==null&&male!=null){
