@@ -74,6 +74,27 @@ function reqUserInfo(url, callback) {
 }
 
 
+function reqUserQuestion(url,callback) {
+    request(url,function (err, res) {
+     var   $=cheerio.load(res.body.toString());
+
+        fs.writeFile('userQuestion.html',res.body.toString(),function (err,data) {
+
+        });
+
+       $('.ContentItem-title a').each(function () {
+           var questionUrl=this.attribs.href;
+           var questionTitle=this.children[0].data;
+           console.log(questionUrl+">>>+"+questionTitle);
+       });
+
+
+    });
+}
+/*
 reqUserLink("https://www.zhihu.com/question/56536646/", function (err, data) {
     //   console.log(data);
-});
+});*/
+reqUserQuestion('http://nba.hupu.com/',function (err, data) {
+
+})
