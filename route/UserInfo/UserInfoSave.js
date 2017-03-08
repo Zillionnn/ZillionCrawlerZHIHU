@@ -12,8 +12,7 @@ function UserSaveRoute() {
         userShema.userName=username;
         userShema.sex=sex;
         userShema.subTopics=subTopic;
-        console.log("save route>>");
-        console.log(userShema);
+    
         userShema.save(function (err) {
             if(err){
                 console.error(err);

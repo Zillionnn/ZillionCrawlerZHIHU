@@ -30,6 +30,8 @@ function reqUserLink(url, callback) {
                     console.log("=======");
                     userInfoSave.saveUserInfo(data.username, data.sex, data.subTopics);
                 });
+
+                userInfoSave.sayHello();
             });
             callback(null, authorLink);
         }
@@ -44,17 +46,24 @@ function reqUserLink(url, callback) {
  */
 function reqUserInfo(url, callback) {
     request(url, function (err, res, body) {
-        $ = cheerio.load(body);
+        console.log(url);
+        $ = cheerio.load(body.toString());
         var username = $(".ProfileHeader-name").text();
-        var sex = $('.Icon--female');
-        if (sex != null) {
+        var sex ;
+        var female=$('.Icon--female');
+        var male=$('.Icon--male');
+        if (female != null&&male==null) {
             sex = 'female';
+        }else if(female==null&&male!=null){
+            sex='male';
+        }else {
+            sex='none';
         }
 
         //关注话题
         var personalTopicList = [];
         var topic='';
-        $('.TopicLink .Popover').each(function () {
+        $('.List-item .TopicLink .Popover').each(function () {
              topic = this.children[0].children[0].data;
            personalTopicList.push(topic);
         });
@@ -65,6 +74,6 @@ function reqUserInfo(url, callback) {
 }
 
 
-reqUserLink("https://www.zhihu.com/question/26961037/", function (err, data) {
+reqUserLink("https://www.zhihu.com/question/56536646/", function (err, data) {
     //   console.log(data);
 });
