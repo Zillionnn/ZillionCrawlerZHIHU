@@ -1,0 +1,70 @@
+var cheerio = require('cheerio');
+var request = require('request');
+var UserInfoSave = require('./route/UserInfo/UserInfoSave');
+var fs = require('fs');
+var userInfoSave = new UserInfoSave();
+
+var authorLinkPage;
+var authorFollowUrl;
+/**
+ * GET USER LINK
+ * 获取用户连接
+ * @param url
+ * @param callback
+ */
+function reqUserLink(url, callback) {
+    request(url, function (err, res, body) {
+        if (!err && res.statusCode == 200) {
+            $ = cheerio.load(body);
+
+            var authorLink;
+            //定位内容
+            $('.author-link').each(function () {
+                authorLink = this.attribs.href;
+                authorLinkPage = "http://www.zhihu.com" + authorLink;
+                authorFollowUrl = "http://www.zhihu.com" + authorLink + '/following/topics';
+
+                reqUserInfo(authorFollowUrl, function (err, data) {
+                    console.log("   request user info >>>>");
+                    console.log(data);
+                    console.log("=======");
+                    userInfoSave.saveUserInfo(data.username, data.sex, data.subTopics);
+                });
+            });
+            callback(null, authorLink);
+        }
+    });
+}
+
+/**
+ * GET USER INFO & INSERT INTO DATABASE
+ * 获取用户页面，并写进数据库
+ * @param url
+ * @param callback
+ */
+function reqUserInfo(url, callback) {
+    request(url, function (err, res, body) {
+        $ = cheerio.load(body);
+        var username = $(".ProfileHeader-name").text();
+        var sex = $('.Icon--female');
+        if (sex != null) {
+            sex = 'female';
+        }
+
+        //关注话题
+        var personalTopicList = [];
+        var topic='';
+        $('.TopicLink .Popover').each(function () {
+             topic = this.children[0].children[0].data;
+           personalTopicList.push(topic);
+        });
+        var userInfo = {username: username, sex: sex, subTopics:personalTopicList };
+        callback(null, userInfo);
+    });
+
+}
+
+
+reqUserLink("https://www.zhihu.com/question/26961037/", function (err, data) {
+    //   console.log(data);
+});
