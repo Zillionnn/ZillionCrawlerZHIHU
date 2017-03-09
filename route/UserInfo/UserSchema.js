@@ -1,6 +1,7 @@
 var mongoose=require('mongoose');
 var Schema=mongoose.Schema;
 var UserSchema=new Schema({
+    userID:String,
     userName:String,
     sex:String,
   /*  local:String,

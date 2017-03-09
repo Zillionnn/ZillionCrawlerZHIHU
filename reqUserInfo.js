@@ -85,16 +85,15 @@ function reqUserQuestion(url,callback) {
        $('.ContentItem-title a').each(function () {
            var questionUrl=this.attribs.href;
            var questionTitle=this.children[0].data;
-           console.log(questionUrl+">>>+"+questionTitle);
+           console.log(questionUrl+">>>"+questionTitle);
        });
 
 
     });
 }
-/*
 reqUserLink("https://www.zhihu.com/question/56536646/", function (err, data) {
     //   console.log(data);
-});*/
-reqUserQuestion('http://nba.hupu.com/',function (err, data) {
+});
+/*reqUserQuestion('https://www.zhihu.com/people/lu-xiao-yi-54/answers',function (err, data) {
 
-})
+})*/
