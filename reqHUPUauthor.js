@@ -92,19 +92,19 @@ function getAuthorInfo(url, callback) {
     // callback(err,$);
 }
 
-async.waterfall([
+async.series([
     function (callback) {
         getVote('https://bbs.hupu.com/freestyle', function (err, data) {
             if (err) {
                 console.log("MAIN PROGRAM ERROR >>" + err);
             } else {
                 topicUrlList = data;
+                console.log(topicUrlList);
             }
         });
         callback(topicUrlList);
     },
     function (callback) {
-
         async.eachSeries(topicUrlList, function (topicUrl) {
             getAuthorPage(topicUrl, function (err, data) {
                 if (err) {
