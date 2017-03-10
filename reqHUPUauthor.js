@@ -13,6 +13,7 @@ var fs = require('fs');
 var topicUrlList = [];
 var authorUrlList = [];
 function getVote(url, callback) {
+    var list=[];
     var pattern = /^\/[A-Za-z]/;
     request(url, function (err, res) {
         console.log(url);
@@ -25,7 +26,8 @@ function getVote(url, callback) {
                 var topicUrl = 'https://bbs.hupu.com' + topicLink;
                 //     console.log(topicUrl);
                 //     getAuthorPage(topicUrl);
-                topicUrlList.push(topicUrl);
+                list.push(topicUrl);
+
             }
 
         });
@@ -35,13 +37,20 @@ function getVote(url, callback) {
         if (nextPage) {
             nextPage = 'https://bbs.hupu.com' + nextPage;
             getVote(nextPage, function (err, data) {
-
+                if(err){
+                    return callback(err);
+                }else{
+                    callback(null,list.concat(data));
+                }
             });
+        }else{
+            callback(null, list);
         }
+
+
     });
 
 
-    callback(null, topicUrlList);
 
 }
 
@@ -92,46 +101,46 @@ function getAuthorInfo(url, callback) {
     // callback(err,$);
 }
 
-async.series([
+async.series(
+    [
     function (callback) {
+        console.log("step 1");
         getVote('https://bbs.hupu.com/freestyle', function (err, data) {
             if (err) {
                 console.log("MAIN PROGRAM ERROR >>" + err);
             } else {
+
                 topicUrlList = data;
-                console.log(topicUrlList);
+                callback(null,topicUrlList);
             }
         });
-        callback(topicUrlList);
+
     },
     function (callback) {
-        async.eachSeries(topicUrlList, function (topicUrl) {
+        console.log('step 2');
+        async.eachSeries(topicUrlList, function (topicUrl,cb) {
+            console.log("step 2:each>>");
             getAuthorPage(topicUrl, function (err, data) {
-                if (err) {
-                    console.log("get author page ERRRRROR>>" + err);
-                } else {
                     authorUrlList = data;
                     console.log(authorUrlList);
-                }
+                cb(err);
             });
-        });
-        callback(authorUrlList);
+
+        },callback);
+
 
     },
     function (callback) {
-        async.eachSeries(authorUrlList,function (authorUrl) {
+        console.log("step 3");
+        async.eachSeries(authorUrlList,function (authorUrl,cb) {
             getAuthorInfo(authorUrl,function (err,data) {
-                if(err){
-                    console.log(err);
-                }else{
                     console.log(data);
-                }
+               cb(err);
             });
 
-        });
-        callback(null);
-    }
+        },callback);
 
+    }
 ],function (err, result) {
-console.log(result);
+//console.log(result);
 });
