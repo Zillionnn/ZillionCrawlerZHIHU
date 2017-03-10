@@ -111,10 +111,11 @@ async.series([
                     console.log("get author page ERRRRROR>>" + err);
                 } else {
                     authorUrlList = data;
+                    console.log(authorUrlList);
                 }
             });
         });
-        callback(null);
+        callback(authorUrlList);
 
     },
     function (callback) {
