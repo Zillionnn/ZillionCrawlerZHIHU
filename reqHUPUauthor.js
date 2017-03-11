@@ -13,7 +13,7 @@ var fs = require('fs');
 var topicUrlList = [];
 var authorUrlList = [];
 function getVote(url, callback) {
-    var list=[];
+    var list = [];
     var pattern = /^\/[A-Za-z]/;
     request(url, function (err, res) {
         console.log(url);
@@ -37,19 +37,18 @@ function getVote(url, callback) {
         if (nextPage) {
             nextPage = 'https://bbs.hupu.com' + nextPage;
             getVote(nextPage, function (err, data) {
-                if(err){
+                if (err) {
                     return callback(err);
-                }else{
-                    callback(null,list.concat(data));
+                } else {
+                    callback(null, list.concat(data));
                 }
             });
-        }else{
+        } else {
             callback(null, list);
         }
 
 
     });
-
 
 
 }
@@ -96,51 +95,48 @@ function getAuthorInfo(url, callback) {
         console.log("AUTHOR NAME>>" + authorName);
         //var authorSex=$('span [itemprop]');
         // console.log(authorSex);
-        callback(authorName);
+        callback(err,authorName);
     });
     // callback(err,$);
 }
 
 async.series(
     [
-    function (callback) {
-        console.log("step 1");
-        getVote('https://bbs.hupu.com/freestyle', function (err, data) {
-            if (err) {
-                console.log("MAIN PROGRAM ERROR >>" + err);
-            } else {
+        function (callback) {
+            console.log("step 1");
+            getVote('https://bbs.hupu.com/freestyle', function (err, data) {
+                if (err) {
+                    console.log("MAIN PROGRAM ERROR >>" + err);
+                } else {
 
-                topicUrlList = data;
-                callback(null,topicUrlList);
-            }
-        });
+                    topicUrlList = data;
+                    callback(null, topicUrlList);
+                }
+            });
 
-    },
-    function (callback) {
-        console.log('step 2');
-        async.eachSeries(topicUrlList, function (topicUrl,cb) {
-            console.log("step 2:each>>");
-            getAuthorPage(topicUrl, function (err, data) {
+        },
+        function (callback) {
+            console.log('step 2');
+            async.eachSeries(topicUrlList, function (topicUrl, cb) {
+                console.log("step 2:each>>"+topicUrl);
+                getAuthorPage(topicUrl, function (err, data) {
                     authorUrlList = data;
                     console.log(authorUrlList);
-                cb(err);
-            });
-
-        },callback);
-
-
-    },
-    function (callback) {
-        console.log("step 3");
-        async.eachSeries(authorUrlList,function (authorUrl,cb) {
-            getAuthorInfo(authorUrl,function (err,data) {
+                    cb(err);
+                });
+            }, callback);
+        },
+        function (callback) {
+            console.log("step 3");
+            async.eachSeries(authorUrlList, function (authorUrl, cb) {
+                getAuthorInfo(authorUrl, function (err, data) {
                     console.log(data);
-               cb(err);
-            });
+                    cb(err);
+                });
 
-        },callback);
+            }, callback);
 
-    }
-],function (err, result) {
+        }
+    ], function (err, result) {
 //console.log(result);
-});
+    });
